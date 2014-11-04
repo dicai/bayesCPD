@@ -63,7 +63,7 @@ model.generate_data(T=1000, hazard=constant_hazard, rate=250)
 model.plot_data()
 ```
 
-![normal-data](https://www.dropbox.com/s/v0awm8n0o8q7gx2/normal-data.png?dl=0)
+![normal-data](http://www.eecs.harvard.edu/~dcai/github/normal-data.png)
 
 Or load your own dataset:
 ```python
@@ -75,7 +75,12 @@ Then run inference and plot results:
 model.inference(rate=250)
 model.plot_results()
 ```
-![normal-result](https://www.dropbox.com/s/m49v5e6o34ocmj3/normal-result.png?dl=0)
+![normal-result](http://www.eecs.harvard.edu/~dcai/github/normal-result.png)
+
+In this particular model, it is implemented such that the predictive means are
+plotted on the data in the top plot. The blue solid line is the predictive mean
+when using the changepoint model, and the orange dotted line is the predictive
+mean under time-independent online Bayesian updating.
 
 We have implemented several models you can currently run in the models
 directory, including univariate and multivariate versions of conjugate
