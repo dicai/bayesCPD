@@ -76,7 +76,10 @@ class BaseModel:
     def load_data(self, data, cpts=[]):
         self.data = data
         self.cpts = cpts
-
+        try:
+            self.D = len(data[0])
+        except TypeError:
+            self.D = 1
 
     def generate_data(self, T, hazard, rate, params=None):
 
@@ -134,6 +137,11 @@ class BaseModel:
             if self.verbose == 'some' or self.verbose == 'all':
                 print 'Changepoints: ', self.changept
 
+        try:
+            self.D = len(self.data[0])
+        except TypeError:
+            self.D = 1
+
     #@profile
     def inference(self, B=None, Q=None, rate=250, full=True,
             operation=meancollapse):
@@ -172,6 +180,7 @@ class BaseModel:
                 # so data[t] is actually the next obs instead of current
                 sstats = self.update_parameters(data[t])
                 self.update(sstats)
+
                 if t != T-1:
                     predprobs = self.get_predprobs(data[t+1])
                     self.preds.append(np.log(predprobs.sum()))
@@ -192,7 +201,7 @@ class BaseModel:
             if self.mode == 'all':
 
                 if B == None or Q == None:
-                    B = T; Q = T
+                    B = T+1; Q = T+1
 
                 if Q < B - 1:
                     raise Exception("Parameter error: requires Q >= B-1")
@@ -267,8 +276,9 @@ class BaseModel:
                     # store run length posterior
                     R.append(prevR)
 
+
                 # reconstruct row
-                if full: #Rmat.append(self.get_full(prevR, B, T-1))
+                if full:
                     if Q >= T or Q == None:
                         Rmat.append(np.array(prevR))
                     else:
@@ -511,8 +521,6 @@ def plot_R(R, T, fig, thresh=10e-6):
         X = R[t].copy()
         X[R[t] < thresh] = 0
         im = pylab.scatter(t*np.ones(L), np.arange(L), c=X, cmap='gray_r', marker='+', norm=norm)
-        #inds = R[t].argsort()[::-1][:2]
-        #fig.scatter(t*np.ones(inds.size), inds, c='r', marker='+')
 
     pylab.xlim(0, T)
     pylab.ylim(0, T)
@@ -586,8 +594,13 @@ class Parameters(object):
         if len(sstat.shape) == 1:
             self.post_params[name] = np.append(prior, sstat)
         else:
-            T, rest = sstat.shape
-            newshape = (T+1,) + (rest,)
+            shape = sstat.shape
+            T = shape[0]; rest = shape[1:]
+            newshape = (T+1,) + rest
+            #print newshape
+
+            assert len(shape) == len(newshape)
+
             self.post_params[name] = np.reshape(np.append(prior, sstat), newshape)
 
 

@@ -17,6 +17,7 @@ Currently, this only supports online changepoint detection.
 * Pandas
 * IPython and IPython Notebook
 
+## Building:
 After cloning the git repository, you'll need to add this directory to your
 PYTHONPATH. Then to build, run the script
 ```bash
